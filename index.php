@@ -1,4 +1,3 @@
-
 <?php
 
 $host = '127.0.0.1';
@@ -14,28 +13,58 @@ $options = [
     PDO::ATTR_EMULATE_PREPARES   => false,
 ];
 try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-    throw new \PDOException($e->getMessage(), (int)$e->getCode());
+$pdo = new PDO($dsn, $user, $pass, $options);
+    echo($dsn);
+} catch (PDOException $e) {
+    throw new PDOException($e->getMessage(), (int)$e->getCode());
 }
-echo ('connected to ' . $db  . ' using ');
-echo $pdo->query('select version()')->fetchColumn();
+$seriesData = $pdo->prepare('SELECT * FROM series');
+$seriesData->execute();
 
-echo "<br/> <br/> <br/>" . "Series" . "<br/>";
+$moviesData = $pdo ->prepare('SELECT * FROM movies');
+$moviesData->execute();
 
-$stmt = $pdo->query('SELECT * FROM netland.series;');
-while ($row = $stmt->fetch())
-{
-    echo "<br/>" . $row['title'] . " - Rating:  " . $row['rating'];
+$series_array = $seriesData->fetchALL(PDO::FETCH_OBJ);
+$movies_array = $moviesData->fetchALL(PDO::FETCH_OBJ);
+
+function echoSeries() {
+    global $series_array;
+    foreach ($series_array as $key) {
+        echo 
+        '<tr><td>' . $key->title .
+        '<td><td>' . $key->rating . 
+        '<td><td>'. "<a href='series.php?id=$key->id'>details</a>" . '</td></tr>';
+    }
 }
-
-echo "<br/> <br/> <br/>" . "Movies" . "<br/>";
-
-$stmt = $pdo->query('SELECT * FROM netland.movies;');
-while ($row = $stmt->fetch())
-{
-    echo "<br/>" . $row['title'] . " - Duur:  " . $row['duur'] . "min";
+function echoMovies() {
+    global $movies_array;
+    foreach ($movies_array as $key) {
+        echo 
+        '<tr><td>' . $key->title .
+        '<td><td>' . $key->duur. 
+        '<td><td>'. "<a href='films.php?id=$key->id'>details</a>" . '</td></tr>';
+    }
 }
-
-// Mocht er toch nog een error zijn msg me dan // 
-?>  
+?>
+<table>
+    <h3>Series<h3>
+        <tr>
+            <th> Titel  </th>
+            <th> Rating </th>
+            <th> Details</th>
+       </tr>
+       <tr>
+           <?php echoSeries($seriesData); ?>
+       </tr>
+</table>
+<table>
+    <h3>Movies<h3>
+        <tr>
+            <th> Titel  </th>
+            <th> Duur </th>
+            <th> Details</th>
+       </tr>
+       <tr>
+           <?php echoMovies($moviesData); ?>
+       </tr>
+</table>

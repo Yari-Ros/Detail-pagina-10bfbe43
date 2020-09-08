@@ -1,0 +1,17 @@
+body {
+    margin: 0em;
+    background-color: #726EFF;
+    font-family: 'Lexend Peta', sans-serif;
+}
+
+.title {
+    display: flex;
+    align-items: center
+}
+
+a {
+    margin: 0em;
+    width: 2em;
+    font-size: 1.2rem;
+    padding-left: 1.4em;
+}
